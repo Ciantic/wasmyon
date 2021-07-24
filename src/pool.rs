@@ -5,6 +5,7 @@
 // Modifications include:
 // - Expose WorkerPool as single function init_thread_workers
 // - Store WorkerPool and ThreadPool in the OnceCell
+// - run_in_worker helper that allows to run in worker and return JS Promise
 
 // Silences warnings from the compiler about Work.func and child_entry_point
 // being unused when the target is not wasm.
