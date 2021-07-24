@@ -36,28 +36,13 @@ pub fn __dummy() {
     }
 }
 
-// #[wasm_bindgen]
-// pub fn sum_in_workers() -> Promise {
-//     run_in_worker(|| {
-//         let a: i32 = (0..100).into_par_iter().sum();
-//         a
-//     });
-//     let done = async move {
-//         match rx.await {
-//             Ok(_data) => Ok(JsValue::from(_data)),
-//             Err(_) => Err(JsValue::undefined()),
-//         }
-//     };
-//     wasm_bindgen_futures::future_to_promise(done)
-// }
-
 #[wasm_bindgen]
 pub fn sum_in_workers() -> Promise {
     run_in_worker(|| (0..100 as i32).into_par_iter().sum::<i32>())
 }
 
-#[wasm_bindgen]
-pub fn example_fun(v: JsValue) -> JsValue {}
+// #[wasm_bindgen]
+// pub fn example_fun(v: JsValue) -> JsValue {}
 
 // Shared hash map
 // ----------------------------------------------------------------------------
