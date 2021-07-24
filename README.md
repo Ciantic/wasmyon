@@ -1,6 +1,6 @@
-# Rust WASM experiment with shared memory
+# Rust WASM experiment with rayon
 
-The example WASM library show cases Crossbeam Channels and shared HashMap usage between workers.
+I'm experimenting with Rayon here.
 
 1. Install [wasm-pack](https://github.com/rustwasm/wasm-pack)
 2. Install [deno](https://deno.land/) for static File HTTP server, see [file-server-deno.ts](./file-server-deno.ts) <sup>1</sup>
@@ -12,7 +12,6 @@ The example WASM library show cases Crossbeam Channels and shared HashMap usage 
 ## How it works?
 
 It initalizes only *one* `WebAssembly.Memory` object and shares it between the workers. See [index.js](./index.js) and [worker.js](./worker.js) for details.
-
 
 ## Footnotes
 

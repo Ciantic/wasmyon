@@ -1,35 +1,25 @@
-import init, {
-    get_from_map,
-    add_to_map,
-    send_to_channel,
-    receive_from_channel,
-} from "./pkg/shared_wasm_experiments.js";
+import init, { child_entry_point } from "./pkg/shared_wasm_experiments.js";
 
-let id = -1;
+// Wait for the main thread to send us the shared module/memory. Once we've got
+// it, initialize it all with the `init`.
+//
+// After our first message all subsequent messages are an entry point to run, so
+// we just do that.
+self.onmessage = (event) => {
+    const [module, memory] = event.data;
+    const initialised = init(module, memory).catch((err) => {
+        // Propagate to main `onerror`:
+        setTimeout(() => {
+            throw err;
+        });
 
-onmessage = async function (m) {
-    if (m.data.task === "init") {
-        await init(undefined, m.data.mem);
-        id = m.data.id;
-        console.log("Worker", id, "init done");
-        postMessage("init done");
-    }
+        // Rethrow to keep promise rejected and prevent execution of further commands:
+        throw err;
+    });
 
-    if (m.data.task === "get_from_map") {
-        console.log("Worker", id, ": get_from_map", m.data.key, get_from_map(m.data.key));
-    }
-
-    if (m.data.task === "add_to_map") {
-        console.log("Worker", id, ": add_to_map", m.data.key, m.data.value);
-        add_to_map(m.data.key, m.data.value);
-    }
-
-    if (m.data.task === "send_to_channel") {
-        console.log("Worker", id, ": send_to_channel", m.data.value);
-        send_to_channel(m.data.value);
-    }
-
-    if (m.data.task === "receive_from_channel") {
-        console.log("Worker", id, ": receive_from_channel", receive_from_channel());
-    }
+    self.onmessage = async (event) => {
+        // This will queue further commands up until the module is fully initialised:
+        await initialised;
+        child_entry_point(event.data);
+    };
 };

@@ -1,3 +1,4 @@
+mod pool;
 mod utils;
 
 use std::{
@@ -7,7 +8,11 @@ use std::{
 };
 
 use crossbeam_channel::{unbounded, Receiver, Sender};
+use futures_channel::oneshot;
+use js_sys::{Promise, Reflect};
 use once_cell::sync::Lazy;
+use pool::run_in_worker;
+use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use wasm_bindgen::prelude::*;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
@@ -30,6 +35,29 @@ pub fn __dummy() {
         log(&"Foo");
     }
 }
+
+// #[wasm_bindgen]
+// pub fn sum_in_workers() -> Promise {
+//     run_in_worker(|| {
+//         let a: i32 = (0..100).into_par_iter().sum();
+//         a
+//     });
+//     let done = async move {
+//         match rx.await {
+//             Ok(_data) => Ok(JsValue::from(_data)),
+//             Err(_) => Err(JsValue::undefined()),
+//         }
+//     };
+//     wasm_bindgen_futures::future_to_promise(done)
+// }
+
+#[wasm_bindgen]
+pub fn sum_in_workers() -> Promise {
+    run_in_worker(|| (0..100 as i32).into_par_iter().sum::<i32>())
+}
+
+#[wasm_bindgen]
+pub fn example_fun(v: JsValue) -> JsValue {}
 
 // Shared hash map
 // ----------------------------------------------------------------------------
