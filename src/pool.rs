@@ -88,11 +88,13 @@ struct PoolState {
     callback: Closure<dyn FnMut(Event)>,
 }
 
+// TODO: I don't know what I'm doing, but this probably required because
+// callback is not Send+Sync
 unsafe impl Send for PoolState {}
 unsafe impl Sync for PoolState {}
 
 struct Work {
-    func: Box<dyn FnOnce() + Send>,
+    func: Box<dyn FnOnce() + Send + 'static>,
 }
 
 // #[wasm_bindgen]
