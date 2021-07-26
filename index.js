@@ -1,11 +1,10 @@
-import init, {
+import {
+    init_with_threads,
     sum_in_workers,
     send_to_channel,
     receive_from_channel,
-    init_thread_workers,
-} from "./pkg/shared_wasm_experiments.js";
-await init();
-await init_thread_workers("./worker.js", 1, navigator.hardwareConcurrency);
+} from "./pkg/threaded.js";
+await init_with_threads(1, navigator.hardwareConcurrency);
 
 // Rayon
 // ----------------------------------------------------------------------------

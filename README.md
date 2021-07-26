@@ -1,6 +1,6 @@
 # Rust WASM experiment with rayon
 
-I'm experimenting with Rayon here.
+I'm experimenting with Rayon here. This pretty much copies the `pool.rs` from the official example, adding some stuff.
 
 1. Install [wasm-pack](https://github.com/rustwasm/wasm-pack)
 2. Install [deno](https://deno.land/) for static File HTTP server, see [file-server-deno.ts](./file-server-deno.ts) <sup>1</sup>
@@ -11,7 +11,7 @@ I'm experimenting with Rayon here.
 
 ## How it works?
 
-It initalizes only *one* `WebAssembly.Memory` object and shares it between the workers. See [index.js](./index.js) and [worker.js](./worker.js) for details.
+It initalizes only *one* `WebAssembly.Memory` object and shares it between the workers. It also creates the workers with blobs.
 
 ## Footnotes
 

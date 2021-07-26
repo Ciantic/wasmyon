@@ -20,17 +20,24 @@ extern "C" {
     fn log(s: &str);
 }
 
-#[wasm_bindgen]
-pub fn __dummy() {
-    // TODO: Without this export, the wasm-pack didn't create imports.wbg and
-    // failed?
-    log(&"Foo");
-}
+// If for some reason wasm-pack doesn't create `imports.wbg` in the JS file, it
+// fails in that case. I found it it's enough to make a dummy method that forces
+// the generation
+
+// #[wasm_bindgen]
+// pub fn __dummy() {
+//     // failed?
+//     log(&"Foo");
+// }
 
 // Rayon
 // ----------------------------------------------------------------------------
 
-#[wasm_bindgen]
+#[wasm_bindgen(typescript_custom_section)]
+const _T1: &'static str = r#"
+export function sum_in_workers(): Promise<number>;
+"#;
+#[wasm_bindgen(skip_typescript)]
 pub fn sum_in_workers() -> Promise {
     run_in_worker(|| (0..100000 as i32).into_par_iter().sum::<i32>())
 }
@@ -45,7 +52,11 @@ pub fn send_to_channel(str: &str) {
     let _ = CHANNEL.0.send(str.into());
 }
 
-#[wasm_bindgen]
+#[wasm_bindgen(typescript_custom_section)]
+const _T1: &'static str = r#"
+export function receive_from_channel(): Promise<string>;
+"#;
+#[wasm_bindgen(skip_typescript)]
 pub fn receive_from_channel() -> Promise {
     run_in_worker(|| {
         let value = CHANNEL.1.recv().unwrap();

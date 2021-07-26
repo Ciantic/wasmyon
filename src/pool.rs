@@ -15,6 +15,8 @@
 //! web workers which can be used to execute `rayon`-style work.
 
 use futures_channel::oneshot;
+use js_sys::Array;
+use js_sys::Reflect;
 use once_cell::sync::OnceCell;
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -22,6 +24,7 @@ use std::sync::Arc;
 use std::sync::RwLock;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
+use web_sys::BlobPropertyBag;
 use web_sys::{DedicatedWorkerGlobalScope, MessageEvent};
 use web_sys::{ErrorEvent, Event, Worker, WorkerOptions};
 
@@ -29,9 +32,13 @@ static WORKER_POOL: OnceCell<WorkerPool> = OnceCell::new();
 static THREAD_POOL: OnceCell<rayon::ThreadPool> = OnceCell::new();
 
 #[wasm_bindgen]
-pub fn init_thread_workers(worker_url: &str, initial: usize, num_of_threads: usize) {
-    let worker_pool = WorkerPool::new(initial, worker_url).unwrap();
+pub fn _init_thread_workers(wasm_jsmodule_url: &str, initial: usize, num_of_threads: usize) {
+    let worker_pool = WorkerPool::new(initial, wasm_jsmodule_url).unwrap();
     let _ = WORKER_POOL.set(worker_pool);
+
+    // logv(&js_sys::eval(&"document.currentScript").unwrap());
+    // logv(&js_sys::global().unchecked_into::<JsValue>());
+    // logv(&url);
 
     let thread_pool = rayon::ThreadPoolBuilder::new()
         .num_threads(num_of_threads)
@@ -79,7 +86,7 @@ macro_rules! console_log {
 }
 
 struct WorkerPool {
-    worker_url: String,
+    wasm_jsmodule_url: String,
     state: Arc<PoolState>,
 }
 
@@ -110,7 +117,7 @@ impl WorkerPool {
     /// Returns any error that may happen while a JS web worker is created and a
     /// message is sent to it.
     // #[wasm_bindgen(constructor)]
-    pub fn new(initial: usize, worker_url: &str) -> Result<WorkerPool, JsValue> {
+    pub fn new(initial: usize, wasm_jsmodule_url: &str) -> Result<WorkerPool, JsValue> {
         let pool = WorkerPool {
             state: Arc::new(PoolState {
                 workers: RwLock::new(Vec::with_capacity(initial)),
@@ -119,7 +126,7 @@ impl WorkerPool {
                     logv(&event);
                 }) as Box<dyn FnMut(Event)>),
             }),
-            worker_url: worker_url.into(),
+            wasm_jsmodule_url: wasm_jsmodule_url.into(),
         };
         for _ in 0..initial {
             let worker = pool.spawn()?;
@@ -141,9 +148,49 @@ impl WorkerPool {
     fn spawn(&self) -> Result<Worker, JsValue> {
         console_log!("spawning new worker");
 
+        let mut opts = BlobPropertyBag::new();
+        opts.type_("text/javascript");
+
+        let arr = Array::new();
+        arr.set(
+            0,
+            format!(
+                r#"
+                import {{ _init_worker, _child_entry_point }} from "{}"; 
+
+                // Wait for the main thread to send us the shared module/memory. Once we've got
+                // it, initialize it all with the `init`.
+                //
+                // After our first message all subsequent messages are an entry point to run, so
+                // we just do that.
+                self.onmessage = (event) => {{
+                    const [module, memory] = event.data;
+                    const initialised = _init_worker(module, memory).catch((err) => {{
+                        // Propagate to main `onerror`:
+                        setTimeout(() => {{
+                            throw err;
+                        }});
+                
+                        // Rethrow to keep promise rejected and prevent execution of further commands:
+                        throw err;
+                    }});
+                
+                    self.onmessage = async (event) => {{
+                        // This will queue further commands up until the module is fully initialised:
+                        await initialised;
+                        _child_entry_point(event.data);
+                    }};
+                }};"#,
+                self.wasm_jsmodule_url
+            ).into(),
+        );
+        let blob = web_sys::Blob::new_with_str_sequence_and_options(&arr, &opts).unwrap();
+        let url = web_sys::Url::create_object_url_with_blob(&blob).unwrap();
+
+        // Create worker (module)
         let opts = WorkerOptions::new();
         js_sys::Reflect::set(&opts, &"type".into(), &"module".into()).unwrap();
-        let worker = Worker::new_with_options(&self.worker_url, &opts)?;
+        let worker = Worker::new_with_options(&url, &opts)?;
 
         // With a worker spun up send it the module/memory so it can start
         // instantiating the wasm module. Later it might receive further
@@ -281,7 +328,7 @@ impl PoolState {
 /// Entry point invoked by `worker.js`, a bit of a hack but see the "TODO" above
 /// about `worker.js` in general.
 #[wasm_bindgen]
-pub fn child_entry_point(ptr: u32) -> Result<(), JsValue> {
+pub fn _child_entry_point(ptr: u32) -> Result<(), JsValue> {
     let ptr = unsafe { Box::from_raw(ptr as *mut Work) };
     let global = js_sys::global().unchecked_into::<DedicatedWorkerGlobalScope>();
     (ptr.func)();
