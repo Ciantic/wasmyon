@@ -22,5 +22,3 @@ workers. It also creates the thread workers within wasm-bindgen JS snippet.
 ## Footnotes
 
 1: If you don't want Deno, you still need a file server that is capable of setting headers `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: require-corp`, otherwise SharedArrayBuffer is not defined. [See documentation.](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer)
-
-https://github.com/rustwasm/wasm-bindgen/blob/master/crates/cli-support/src/lib.rs#L632
