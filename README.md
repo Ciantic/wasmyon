@@ -19,6 +19,13 @@ To test out, go to `examples/simple` directory and do the following:
 It initalizes only _one_ `WebAssembly.Memory` object and shares it between the
 workers. It also creates the thread workers within wasm-bindgen JS snippet.
 
+## TODO
+
+
+[ ] Auto scalable worker pool, so that it terminates workers when they are not
+    being utilized for a while...
+
+
 ## Footnotes
 
 1: If you don't want Deno, you still need a file server that is capable of setting headers `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: require-corp`, otherwise SharedArrayBuffer is not defined. [See documentation.](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer)
