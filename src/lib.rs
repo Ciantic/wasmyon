@@ -64,7 +64,11 @@ where
     R: Into<JsValue> + Send + 'static,
 {
     let (tx, rx) = oneshot::channel();
-    let (worker_pool, thread_pool) = init_thread_workers(0, 8);
+    let hardware_threads = js_sys::eval("navigator.hardwareConcurrency")
+        .unwrap()
+        .as_f64()
+        .unwrap() as usize;
+    let (worker_pool, thread_pool) = init_thread_workers(0, hardware_threads);
     worker_pool
         .run(move || {
             thread_pool.install(|| {
