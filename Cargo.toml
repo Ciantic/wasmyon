@@ -3,7 +3,6 @@ name = "wasmyon"
 version = "0.1.0"
 authors = ["Jari Pennanen <ciantic@oksidi.com>"]
 edition = "2018"
-publish = false
 repository = ""
 
 [lib]

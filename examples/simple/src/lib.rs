@@ -36,6 +36,7 @@ extern "C" {
 const _T1: &'static str = r#"
 export function sum_in_workers(): Promise<number>;
 "#;
+
 #[wasm_bindgen(skip_typescript)]
 pub fn sum_in_workers() -> Promise {
     run_in_worker(|| (0..100000 as i32).into_par_iter().sum::<i32>())
@@ -55,10 +56,8 @@ pub fn send_to_channel(str: &str) {
 const _T1: &'static str = r#"
 export function receive_from_channel(): Promise<string>;
 "#;
+
 #[wasm_bindgen(skip_typescript)]
 pub fn receive_from_channel() -> Promise {
-    run_in_worker(|| {
-        let value = CHANNEL.1.recv().unwrap();
-        value
-    })
+    run_in_worker(|| CHANNEL.1.recv().unwrap())
 }
