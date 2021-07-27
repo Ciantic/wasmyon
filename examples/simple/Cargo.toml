@@ -1,5 +1,5 @@
 [package]
-name = "wasmyon"
+name = "wasmyon-simple"
 version = "0.1.0"
 authors = ["Jari Pennanen <ciantic@oksidi.com>"]
 edition = "2018"
@@ -14,38 +14,16 @@ default = ["console_error_panic_hook"]
 
 [dependencies]
 wasm-bindgen = "0.2.63"
-wasm-bindgen-futures = "*"
-futures-channel-preview = "0.3.0-alpha.18"
 console_error_panic_hook = { version = "0.1.6", optional = true }
 wee_alloc = { version = "0.4.5", optional = true }
-once_cell = "*"
 crossbeam-channel = "*"
+once_cell = "*"
 js-sys = "*"
 rayon = "*"
+wasmyon = { path = "../../" }
 
-[dependencies.web-sys]
-version = "*"
-features = [
-  'CanvasRenderingContext2d',
-  'ErrorEvent',
-  'Event',
-  'ImageData',
-  'Navigator',
-  'Window',
-  'Worker',
-  'Url',
-  'WorkerOptions',
-  'DedicatedWorkerGlobalScope',
-  'MessageEvent',
-]
 [dev-dependencies]
 wasm-bindgen-test = "0.3.13"
 
 [profile.release]
 opt-level = "s" # Tell `rustc` to optimize for small code size.
-
-
-[workspace]
-members = [
-    "examples/simple",
-]

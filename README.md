@@ -11,8 +11,10 @@ I'm experimenting with Rayon here. This pretty much copies the `pool.rs` from th
 
 ## How it works?
 
-It initalizes only *one* `WebAssembly.Memory` object and shares it between the workers. It also creates the workers with blobs.
+It initalizes only _one_ `WebAssembly.Memory` object and shares it between the workers. It also creates the workers with blobs.
 
 ## Footnotes
 
 1: If you don't want Deno, you still need a file server that is capable of setting headers `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: require-corp`, otherwise SharedArrayBuffer is not defined. [See documentation.](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer)
+
+https://github.com/rustwasm/wasm-bindgen/blob/master/crates/cli-support/src/lib.rs#L632

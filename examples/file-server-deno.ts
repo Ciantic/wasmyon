@@ -9,7 +9,7 @@ app.use(async (context) => {
     context.response.headers.append("Cross-Origin-Opener-Policy", "same-origin");
 
     await send(context, context.request.url.pathname, {
-        root: `${Deno.cwd()}`,
+        root: `${Deno.cwd()}/${Deno.args[0]}`,
         index: "index.html",
     });
 });
@@ -21,4 +21,3 @@ if (Deno.build.os === "windows") {
     });
 }
 await app.listen({ port: 8000 });
- 

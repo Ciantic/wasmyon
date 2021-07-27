@@ -1,10 +1,6 @@
-import {
-    init_with_threads,
-    sum_in_workers,
-    send_to_channel,
-    receive_from_channel,
-} from "./pkg/threaded.js";
-await init_with_threads(1, navigator.hardwareConcurrency);
+import init, { sum_in_workers, send_to_channel, receive_from_channel } from "./pkg/index.js";
+
+await init();
 
 // Rayon
 // ----------------------------------------------------------------------------

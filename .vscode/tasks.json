@@ -2,17 +2,30 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "wasm build",
+            "label": "simple/ wasm build",
             "type": "shell",
             "command": "wasm-pack",
-            "args": ["build", "--target", "web"]
+            "args": ["build", "--target", "web", "--out-name", "index"],
+            "options": {
+                "cwd": "examples/simple"
+            }
         },
         {
-            "label": "wasm server localhost:8080",
+            "label": "simple/ wasm server localhost:8080",
             "type": "shell",
             "command": "deno",
-            "args": ["run", "--allow-run", "--allow-read", "--allow-net", "file-server-deno.ts"],
-            "isBackground": true
+            "args": [
+                "run",
+                "--allow-run",
+                "--allow-read",
+                "--allow-net",
+                "file-server-deno.ts",
+                "simple"
+            ],
+            "isBackground": true,
+            "options": {
+                "cwd": "examples"
+            }
         }
     ]
 }
