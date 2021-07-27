@@ -64,10 +64,12 @@ where
     R: Into<JsValue> + Send + 'static,
 {
     let (tx, rx) = oneshot::channel();
-    let hardware_threads = js_sys::eval("navigator.hardwareConcurrency")
+
+    let hardware_threads = web_sys::window()
         .unwrap()
-        .as_f64()
-        .unwrap() as usize;
+        .navigator()
+        .hardware_concurrency() as usize;
+
     let (worker_pool, thread_pool) = init_thread_workers(0, hardware_threads);
     worker_pool
         .run(move || {
