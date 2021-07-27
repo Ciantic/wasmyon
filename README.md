@@ -22,8 +22,8 @@ workers. It also creates the thread workers within wasm-bindgen JS snippet.
 ## TODO
 
 
-[ ] Auto scalable worker pool, so that it terminates workers when they are not
-    being utilized for a while...
+- [ ] Auto scalable worker pool, so that it terminates workers when they are not
+      being utilized for a while...
 
 
 ## Footnotes
