@@ -1,14 +1,14 @@
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
-use quote::{quote, ToTokens, TokenStreamExt};
-use syn::{parse_macro_input, parse_quote, token::RArrow, Attribute, ItemFn, ReturnType, Type};
+use quote::{quote, ToTokens};
+use syn::{parse_macro_input, parse_quote, token::RArrow, ItemFn, ReturnType, Type};
 
 /// Runs the function in a WASM worker, returning a Promise
 ///
 /// This also retains the original function, and creates a new function for the
 /// wasm named `__wasm_ORIGINAL_FUNCTION`.
 #[proc_macro_attribute]
-pub fn promise(attr: TokenStream, item: TokenStream) -> TokenStream {
+pub fn promise(_attr: TokenStream, item: TokenStream) -> TokenStream {
     // println!("attr: \"{}\"", attr.to_string());
     // println!("item: \"{}\"", item.to_string());
     let original_fn: TokenStream2 = item.clone().into();
