@@ -2,6 +2,8 @@
 name = "wasmyon-macro-support"
 version = "0.1.0"
 edition = "2018"
+repository = "https://github.com/Ciantic/wasmyon"
+license = "MIT"
 
 [lib]
 proc-macro = true
@@ -9,6 +11,6 @@ proc-macro = true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-syn = "*"
-quote = "*"
-proc-macro2 = "*"
+syn = "1.0"
+quote = "1.0"
+proc-macro2 = "1.0"
