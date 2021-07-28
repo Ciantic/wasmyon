@@ -1,4 +1,4 @@
-use proc_macro::*;
+use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens, TokenStreamExt};
 use syn::{parse_macro_input, parse_quote, token::RArrow, Attribute, ItemFn, ReturnType, Type};
