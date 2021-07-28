@@ -20,7 +20,7 @@ function sum_in_workers() -> Promise<any>
 Additionally, if you want to run something in a worker by yourself, you can do it like this:
 
 ```rust
-run_in_workers(|| yourstuff)
+run_in_worker(|| yourstuff)
 ```
 
 ## Try out the example
