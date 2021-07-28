@@ -1,5 +1,6 @@
 [package]
 name = "wasmyon-macro-support"
+description = "Provides macro support for the main wasmyon crate"
 version = "0.1.0"
 edition = "2018"
 repository = "https://github.com/Ciantic/wasmyon"
