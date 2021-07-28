@@ -1,6 +1,6 @@
-# Rust WASM experiment with rayon
+# wasmyon
 
-I'm experimenting with Rayon here. This pretty much copies the `pool.rs` from the official example, adding some stuff.
+Experimental "turn key" solution for wasm and rayon. This pretty much copies the `pool.rs` from the official example, adding some stuff.
 
 To see how to use this library, see the [`examples/simple/src/lib.rs`](./examples/simple/src/lib.rs). In essence all rayon calls must return a JS `Promise` to work correctly, so the API is: 
 
