@@ -30,8 +30,7 @@
         {
             "label": "publish",
             "type": "shell",
-            "command": "deno",
-            "args": ["run", "--allow-run", "publish.ts"]
+            "command": "publish.sh"
         }
     ]
 }
