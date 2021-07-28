@@ -1,9 +1,7 @@
 use crossbeam_channel::{unbounded, Receiver, Sender};
-use js_sys::Promise;
 use once_cell::sync::Lazy;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use wasm_bindgen::prelude::*;
-use wasmyon::run_in_worker;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
