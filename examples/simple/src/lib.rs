@@ -2,6 +2,7 @@ use crossbeam_channel::{unbounded, Receiver, Sender};
 use once_cell::sync::Lazy;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use wasm_bindgen::prelude::*;
+use wasmyon::wasmyon_promise;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
@@ -30,7 +31,7 @@ extern "C" {
 // Rayon
 // ----------------------------------------------------------------------------
 
-#[wasmyon::promise]
+#[wasmyon_promise]
 pub fn sum_in_workers() -> i32 {
     (0..100000 as i32).into_par_iter().sum::<i32>()
 }
@@ -45,7 +46,7 @@ pub fn send_to_channel(str: &str) {
     let _ = CHANNEL.0.send(str.into());
 }
 
-#[wasmyon::promise]
+#[wasmyon_promise]
 pub fn receive_from_channel() -> String {
     CHANNEL.1.recv().unwrap()
 }

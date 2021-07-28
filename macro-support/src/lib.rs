@@ -8,7 +8,7 @@ use syn::{parse_macro_input, parse_quote, token::RArrow, ItemFn, ReturnType, Typ
 /// This also retains the original function, and creates a new function for the
 /// wasm named `__wasm_ORIGINAL_FUNCTION`.
 #[proc_macro_attribute]
-pub fn promise(_attr: TokenStream, item: TokenStream) -> TokenStream {
+pub fn wasmyon_promise(_attr: TokenStream, item: TokenStream) -> TokenStream {
     // println!("attr: \"{}\"", attr.to_string());
     // println!("item: \"{}\"", item.to_string());
     let original_fn: TokenStream2 = item.clone().into();
@@ -30,7 +30,7 @@ pub fn promise(_attr: TokenStream, item: TokenStream) -> TokenStream {
 
     // TODO: How do we change TypeScript output type to Promise<ORIGINALTYPE>?
     let attrs: TokenStream2 = parse_quote!(
-        #[wasm_bindgen(js_name = #wasm_fn_name)]
+        #[wasm_bindgen::prelude::wasm_bindgen(js_name = #wasm_fn_name)]
     );
 
     TokenStream::from(quote! (

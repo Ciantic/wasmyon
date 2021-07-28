@@ -5,7 +5,7 @@ Experimental "turn key" solution for wasm and rayon. This pretty much copies the
 To see how to use this library, see the [`examples/simple/src/lib.rs`](./examples/simple/src/lib.rs). In essence all rayon calls must return a JS `Promise` to work correctly, so the API is: 
 
 ```rust
-#[wasmyon::promise]
+#[wasmyon_promise]
 pub fn sum_in_workers() -> i32 {
     (0..100000 as i32).into_par_iter().sum::<i32>()
 }
