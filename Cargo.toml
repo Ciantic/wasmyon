@@ -4,6 +4,7 @@ version = "0.1.0"
 authors = ["Jari Pennanen <ciantic@oksidi.com>"]
 edition = "2018"
 repository = "https://github.com/Ciantic/wasmyon"
+license = "MIT"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -23,7 +24,7 @@ rayon = "1.5"
 wasmyon-macro-support = { path = "macro-support" }
 
 [dependencies.web-sys]
-version = "*"
+version = "0.3"
 features = [
   'ErrorEvent',
   'Event',
