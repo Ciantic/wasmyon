@@ -1,6 +1,6 @@
 use proc_macro::TokenStream;
-use proc_macro2::{token_stream::IntoIter, Ident, Span, TokenStream as TokenStream2};
-use quote::{ToTokens, __private::ext::RepAsIteratorExt, quote};
+use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
+use quote::{quote, ToTokens};
 use syn::{parse_macro_input, parse_quote, token::RArrow, ItemFn, ReturnType, Type};
 
 /// Runs the function in a WASM worker, returning a Promise
