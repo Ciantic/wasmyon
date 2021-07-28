@@ -45,6 +45,9 @@ workers. It also creates the thread workers within wasm-bindgen JS snippet.
 
 - [ ] Auto scalable worker pool, so that it terminates workers when they are not
       being utilized for a while...
+- [ ] TypeScript support is not good, because `js_sys::Promise` doesn't have
+      type the function return type is typed `Promise<any>`. This probably
+      requires a patch to `wasm_bindgen`.
 
 
 ## Footnotes
