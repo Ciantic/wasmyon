@@ -28,7 +28,7 @@ run_in_worker(|| yourstuff)
 To test out, go to `examples/simple` directory and do the following:
 
 1. Install [wasm-pack](https://github.com/rustwasm/wasm-pack)
-2. Install [deno](https://deno.land/) for static File HTTP server, see [file-server-deno.ts](./file-server-deno.ts) <sup>1</sup>
+2. Install [deno](https://deno.land/) for static File HTTP server, see [file-server-deno.ts](./examples/file-server-deno.ts) <sup>1</sup>
 3. Run `wasm-pack build --target web --out-name index`
 4. Run `deno run --allow-run --allow-net --allow-read ../file-server-deno.ts
    simple`
