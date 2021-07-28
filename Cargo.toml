@@ -4,6 +4,8 @@ description = "Yet another way to combine rayon and wasm"
 version = "0.1.0"
 authors = ["Jari Pennanen <ciantic@oksidi.com>"]
 edition = "2018"
+readme = "README.md"
+homepage = "https://github.com/Ciantic/wasmyon"
 repository = "https://github.com/Ciantic/wasmyon"
 license = "MIT"
 

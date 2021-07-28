@@ -3,7 +3,9 @@ name = "wasmyon-macro-support"
 description = "Provides macro support for the main wasmyon crate"
 version = "0.1.0"
 edition = "2018"
+readme = "README.md"
 authors = ["Jari Pennanen <ciantic@oksidi.com>"]
+homepage = "https://github.com/Ciantic/wasmyon"
 repository = "https://github.com/Ciantic/wasmyon"
 license = "MIT"
 
