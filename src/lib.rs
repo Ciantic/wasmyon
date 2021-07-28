@@ -22,6 +22,8 @@ use wasm_bindgen::JsCast;
 use web_sys::{DedicatedWorkerGlobalScope, MessageEvent};
 use web_sys::{ErrorEvent, Event, Worker};
 
+pub use wasmyon_macro_support::*;
+
 static WORKER_POOL: OnceCell<WorkerPool> = OnceCell::new();
 static THREAD_POOL: OnceCell<rayon::ThreadPool> = OnceCell::new();
 

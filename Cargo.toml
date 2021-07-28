@@ -21,6 +21,7 @@ once_cell = "*"
 crossbeam-channel = "*"
 js-sys = "*"
 rayon = "*"
+wasmyon-macro-support = { path = "macro-support" }
 
 [dependencies.web-sys]
 version = "*"
@@ -47,4 +48,5 @@ opt-level = "s" # Tell `rustc` to optimize for small code size.
 [workspace]
 members = [
     "examples/simple",
+    "macro-support"
 ]

@@ -2,7 +2,28 @@
 
 I'm experimenting with Rayon here. This pretty much copies the `pool.rs` from the official example, adding some stuff.
 
-To test out how to use this library, see the [`examples/simple/src/lib.rs`](./examples/simple/src/lib.rs). In essence all rayon calls must return a JS `Promise` to work correctly, so the API is just single function at the moment: `run_in_workers(|| yourstuff)`.
+To see how to use this library, see the [`examples/simple/src/lib.rs`](./examples/simple/src/lib.rs). In essence all rayon calls must return a JS `Promise` to work correctly, so the API is: 
+
+```rust
+#[wasmyon::promise]
+pub fn sum_in_workers() -> i32 {
+    (0..100000 as i32).into_par_iter().sum::<i32>()
+}
+```
+
+This creates a JS wrapper function:
+
+```typescript
+function sum_in_workers() -> Promise<any>
+```
+
+Additionally, if you want to run something in a worker by yourself, you can do it like this:
+
+```rust
+run_in_workers(|| yourstuff)
+```
+
+## Try out the example
 
 To test out, go to `examples/simple` directory and do the following:
 
