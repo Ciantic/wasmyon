@@ -31,11 +31,7 @@
             "label": "publish",
             "type": "shell",
             "command": "deno",
-            "args": ["run", "--allow-run", "publish.ts"],
-            "isBackground": true,
-            "options": {
-                "cwd": "examples"
-            }
+            "args": ["run", "--allow-run", "publish.ts"]
         }
     ]
 }
