@@ -23,6 +23,8 @@ Additionally, if you want to run something in a worker by yourself, you can do i
 run_in_worker(|| yourstuff)
 ```
 
+**Note** Currently the library assumes your application is generated with `wasm-pack` using `--out-name index.js`. This is because there is no way to get `import.meta.url` in the WASM, this is a limitation in wasm-bindgen.
+
 ## Try out the example
 
 To test out, go to `examples/simple` directory and do the following:
