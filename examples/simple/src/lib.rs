@@ -50,3 +50,18 @@ pub fn send_to_channel(str: &str) {
 pub fn receive_from_channel() -> String {
     CHANNEL.1.recv().unwrap()
 }
+
+// TypeScript with full type
+// -----------------------------------------------------------------------------
+
+// unfortunately this is only way to get proper type for your exported function:
+
+#[wasm_bindgen(typescript_custom_section)]
+const _TS: &'static str = r#"
+export function sum_in_workers_with_ts(): Promise<number>;
+"#;
+
+#[wasmyon_promise(skip_typescript)]
+pub fn sum_in_workers_with_ts() -> i32 {
+    (0..100000 as i32).into_par_iter().sum::<i32>()
+}
