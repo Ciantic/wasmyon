@@ -2,6 +2,10 @@
 
 Experimental "turn key" solution for wasm and rayon. This pretty much copies the `pool.rs` from the official example, adding some stuff.
 
+**Note** Currently the library assumes your application is generated with
+`wasm-pack` using `--target web --out-name index`. This is because there is no
+way to get `import.meta.url` from the WASM module.
+
 To see how to use this library, see the [`examples/simple/src/lib.rs`](./examples/simple/src/lib.rs). In essence all rayon calls must return a JS `Promise` to work correctly, so the API is: 
 
 ```rust
@@ -14,8 +18,10 @@ pub fn sum_in_workers() -> i32 {
 This creates a JS wrapper function:
 
 ```typescript
-function sum_in_workers() -> Promise<any>
+function sum_in_workers(): Promise<any>
 ```
+
+The attribute parameters are passed almost as is to the wasm_bindgen, however there is few extra parameters: `#[wasmyon_promise(serde)]` means the result should be parsed by serde feature, and `#[wasmyon_promise(serde_wasm_bindgen)]` means it should be parsed by `serde-wasm-bindgen` crate.
 
 Additionally, if you want to run something in a worker by yourself, you can do it like this:
 
@@ -23,9 +29,7 @@ Additionally, if you want to run something in a worker by yourself, you can do i
 run_in_worker(|| yourstuff)
 ```
 
-**Note** Currently the library assumes your application is generated with
-`wasm-pack` using `--out-name index`. This is because there is no way to get
-`import.meta.url` in the WASM, this is a limitation in wasm-bindgen.
+It returns a `Future`.
 
 ## Try out the example
 
