@@ -49,6 +49,7 @@ workers. It also creates the thread workers within wasm-bindgen JS snippet.
 
 - [ ] Auto scalable worker pool, so that it terminates workers when they are not
       being utilized for a while...
+- [ ] Number of used threads (max and initial) should be configurable on the fly
 - [ ] TypeScript requires work. Because `js_sys::Promise` isn't giving a way to
       type the output type. For now it's just `Promise<any>`. To fix this, it
       probably requires a patch to `wasm_bindgen`.

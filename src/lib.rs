@@ -14,6 +14,7 @@
 use futures_channel::oneshot;
 use once_cell::sync::OnceCell;
 use std::cell::RefCell;
+use std::future::Future;
 use std::rc::Rc;
 use std::sync::Arc;
 use std::sync::RwLock;
@@ -44,15 +45,19 @@ extern "C" {
     fn createThreadWorker(wasm_module: JsValue, wasm_memory: JsValue) -> Worker;
 }
 
-fn init_thread_workers(
-    initial: usize,
-    num_of_threads: usize,
-) -> (&'static WorkerPool, &'static rayon::ThreadPool) {
-    let worker_pool = WORKER_POOL.get_or_init(|| WorkerPool::new(initial).unwrap());
-
+fn init_thread_workers() -> (&'static WorkerPool, &'static rayon::ThreadPool) {
+    // TODO: Make number of threads dynamic (can be changed on the fly...)
+    let worker_pool = WORKER_POOL.get_or_init(|| {
+        let initial_thread_count = 0;
+        WorkerPool::new(initial_thread_count).unwrap()
+    });
     let thread_pool = THREAD_POOL.get_or_init(|| {
+        let max_hardware_threads = web_sys::window()
+            .unwrap()
+            .navigator()
+            .hardware_concurrency() as usize;
         rayon::ThreadPoolBuilder::new()
-            .num_threads(num_of_threads)
+            .num_threads(max_hardware_threads)
             .spawn_handler(|thread| Ok(worker_pool.run(|| thread.run()).unwrap()))
             .build()
             .unwrap()
@@ -60,19 +65,13 @@ fn init_thread_workers(
     (&worker_pool, &thread_pool)
 }
 
-pub fn run_in_worker<R, F1>(f: F1) -> js_sys::Promise
+pub fn run_in_worker<R, F1>(f: F1) -> impl Future<Output = Result<R, oneshot::Canceled>>
 where
     F1: (FnOnce() -> R) + Send + 'static,
-    R: Into<JsValue> + Send + 'static,
+    R: Send + 'static,
 {
     let (tx, rx) = oneshot::channel();
-
-    let hardware_threads = web_sys::window()
-        .unwrap()
-        .navigator()
-        .hardware_concurrency() as usize;
-
-    let (worker_pool, thread_pool) = init_thread_workers(0, hardware_threads);
+    let (worker_pool, thread_pool) = init_thread_workers();
     worker_pool
         .run(move || {
             thread_pool.install(|| {
@@ -80,13 +79,49 @@ where
             })
         })
         .unwrap();
-    let done = async move {
-        match rx.await {
-            Ok(data) => Ok(data.into()),
-            Err(_) => Err(JsValue::undefined()),
+
+    async move { rx.await }
+}
+
+pub fn run_in_worker_as_promise<R, F1>(f: F1) -> js_sys::Promise
+where
+    F1: (FnOnce() -> R) + Send + 'static,
+    R: Into<JsValue> + Send + 'static,
+{
+    wasm_bindgen_futures::future_to_promise(async {
+        match run_in_worker(f).await {
+            Ok(res) => Ok(res.into()),
+            Err(_) => Err(JsValue::UNDEFINED),
         }
-    };
-    wasm_bindgen_futures::future_to_promise(done)
+    })
+}
+
+#[cfg(feature = "serde")]
+pub fn run_in_worker_serde<R, F1>(f: F1) -> js_sys::Promise
+where
+    F1: (FnOnce() -> R) + Send + 'static,
+    R: serde::Serialize + Send + 'static,
+{
+    wasm_bindgen_futures::future_to_promise(async {
+        match run_in_worker(f).await {
+            Ok(res) => Ok(JsValue::from_serde(&res).unwrap()),
+            Err(_) => Err(JsValue::UNDEFINED),
+        }
+    })
+}
+
+#[cfg(feature = "serde-wasm-bindgen")]
+pub fn run_in_worker_serde_wasm_bindgen<R, F1>(f: F1) -> js_sys::Promise
+where
+    F1: (FnOnce() -> R) + Send + 'static,
+    R: serde::Serialize + Send + 'static,
+{
+    wasm_bindgen_futures::future_to_promise(async {
+        match run_in_worker(f).await {
+            Ok(res) => Ok(serde_wasm_bindgen::to_value(&res).unwrap()),
+            Err(_) => Err(JsValue::UNDEFINED),
+        }
+    })
 }
 
 #[wasm_bindgen]

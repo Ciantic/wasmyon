@@ -1,6 +1,7 @@
 use crossbeam_channel::{unbounded, Receiver, Sender};
 use once_cell::sync::Lazy;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
+use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 use wasmyon::wasmyon_promise;
 
@@ -65,3 +66,35 @@ export function sum_in_workers_with_ts(): Promise<number>;
 pub fn sum_in_workers_with_ts() -> i32 {
     (0..100000 as i32).into_par_iter().sum::<i32>()
 }
+
+// Wasm_bindgen struct
+// ----------------------------------------------------------------------------
+
+#[wasm_bindgen]
+pub struct ExampleObject {
+    pub value: i32,
+}
+
+#[wasmyon_promise(serde)]
+pub fn example_with_object() -> ExampleObject {
+    ExampleObject {
+        value: (0..100000 as i32).into_par_iter().sum::<i32>(),
+    }
+}
+
+// Wasm_bindgen with serde
+// ----------------------------------------------------------------------------
+
+#[derive(Serialize, Deserialize)]
+pub struct ExampleAnonymous {
+    pub some_numbers: Vec<i32>,
+    pub some_string: String,
+}
+
+// #[wasmyon_promise]
+// pub fn example_with_serde() -> ExampleAnonymous {
+//     ExampleAnonymous {
+//         some_string: "Okay".to_owned(),
+//         some_numbers: vec![(0..100000 as i32).into_par_iter().sum::<i32>()],
+//     }
+// }

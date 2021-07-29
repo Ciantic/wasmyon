@@ -3,5 +3,7 @@
     "deno.enable": true,
     "deno.lint": true,
     "deno.unstable": true,
-    "rust-analyzer.experimental.procAttrMacros": true
+    "rust-analyzer.experimental.procAttrMacros": true,
+    "rust-analyzer.cargo.allFeatures": true
+    // "rust-analyzer.cargo.features": []
 }

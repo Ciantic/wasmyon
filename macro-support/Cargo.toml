@@ -18,3 +18,5 @@ proc-macro = true
 syn = "1.0"
 quote = "1.0"
 proc-macro2 = "1.0"
+serde = { version = "1.0", optional = true }
+serde-wasm-bindgen = { version = "0.3", optional = true }
