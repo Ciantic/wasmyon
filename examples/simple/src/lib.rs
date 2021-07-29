@@ -75,14 +75,14 @@ pub struct ExampleObject {
     pub value: i32,
 }
 
-#[wasmyon_promise(serde)]
+#[wasmyon_promise]
 pub fn example_with_object() -> ExampleObject {
     ExampleObject {
         value: (0..100000 as i32).into_par_iter().sum::<i32>(),
     }
 }
 
-// Wasm_bindgen with serde
+// Parse JSValue with serde
 // ----------------------------------------------------------------------------
 
 #[derive(Serialize, Deserialize)]
@@ -91,10 +91,21 @@ pub struct ExampleAnonymous {
     pub some_string: String,
 }
 
-// #[wasmyon_promise]
-// pub fn example_with_serde() -> ExampleAnonymous {
-//     ExampleAnonymous {
-//         some_string: "Okay".to_owned(),
-//         some_numbers: vec![(0..100000 as i32).into_par_iter().sum::<i32>()],
-//     }
-// }
+#[wasmyon_promise(serde)]
+pub fn example_with_serde() -> ExampleAnonymous {
+    ExampleAnonymous {
+        some_numbers: vec![(0..100000 as i32).into_par_iter().sum::<i32>()],
+        some_string: "Foo".to_owned(),
+    }
+}
+
+// Parse JSValue with serde-wasm-bindgen
+// ----------------------------------------------------------------------------
+
+#[wasmyon_promise(serde_wasm_bindgen)]
+pub fn example_with_serde_wasm_bindgen() -> ExampleAnonymous {
+    ExampleAnonymous {
+        some_numbers: vec![(0..100000 as i32).into_par_iter().sum::<i32>()],
+        some_string: "Foo".to_owned(),
+    }
+}

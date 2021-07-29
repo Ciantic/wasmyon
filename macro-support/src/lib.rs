@@ -1,10 +1,15 @@
+use std::str::FromStr;
+
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span, TokenStream as TokenStream2};
 use quote::{quote, ToTokens};
-use syn::{
-    parse::Parse, parse_macro_input, parse_quote, token::RArrow, Attribute, ItemFn, Meta,
-    NestedMeta, ReturnType, Type,
-};
+use syn::{parse_macro_input, parse_quote, token::RArrow, ItemFn, ReturnType, Type};
+
+enum JsValueParsing {
+    JsValueInto,
+    Serde,
+    SerdeWasmBindgen,
+}
 
 /// Runs the function in a WASM worker, returning a Promise
 ///
@@ -16,29 +21,30 @@ use syn::{
 /// named `__wasm_ORIGINAL_FUNCTION`.
 #[proc_macro_attribute]
 pub fn wasmyon_promise(attr: TokenStream, item: TokenStream) -> TokenStream {
-    println!("{}", attr.to_string());
-    println!("{}", item.to_string());
-    let args: Vec<syn::NestedMeta> = parse_macro_input!(attr as Vec<syn::NestedMeta>);
-    // let args_tokens = args.iter().filter_map(|f| {
-    //     match f {
-    //         NestedMeta::Meta(Meta::Path(v)) => {
-    //             todo!()
-    //         },
-    //         _ => todo!()
-    //     }
-    //     // if format!("{}", f) == "foo" {
-    //     //     None
-    //     // } else {
-    //     //     Some(f)
-    //     // }
-    // }
-    //     // NestedMeta::Meta(v) if f.to_string() == "serde" => Some(f),
-    //     // _ => ,
-    // );
-    // let foo = quote::quote!(#(#args_tokens),*);
+    // println!("{}", attr.to_string());
+    // println!("{}", item.to_string());
 
-    // let mut wasm_bindgen_params = TokenStream2::from(attr);
-    let mut wasm_bindgen_params = TokenStream2::new();
+    let attr_str = attr.to_string();
+    let (jsparsing, attr) = if attr_str.contains("serde_wasm_bindgen") {
+        (
+            JsValueParsing::SerdeWasmBindgen,
+            TokenStream2::from_str(
+                &attr_str
+                    .replace("serde_wasm_bindgen", "")
+                    .replacen(",", "", 1),
+            )
+            .unwrap(),
+        )
+    } else if attr_str.contains("serde") {
+        (
+            JsValueParsing::Serde,
+            TokenStream2::from_str(&attr_str.replace("serde", "").replacen(",", "", 1)).unwrap(),
+        )
+    } else {
+        (JsValueParsing::JsValueInto, attr.into())
+    };
+
+    let mut wasm_bindgen_params = attr.clone();
     let item_original = item.clone();
     let original_fn: ItemFn = parse_macro_input!(item_original as ItemFn);
 
@@ -59,9 +65,18 @@ pub fn wasmyon_promise(attr: TokenStream, item: TokenStream) -> TokenStream {
 
     // Set new name and body, return type is js_sys::Promise
     wasm_fn.sig.ident = Ident::new(&("__wasm_".to_owned() + &wasm_fn_name), Span::call_site());
-    wasm_fn.block = Box::new(parse_quote!({
-        wasmyon::run_in_worker_as_promise(move || #wasm_fn_body)
-    }));
+
+    wasm_fn.block = Box::new(match jsparsing {
+        JsValueParsing::JsValueInto => {
+            parse_quote!({wasmyon::run_in_worker_as_promise(move || #wasm_fn_body)})
+        }
+        JsValueParsing::Serde => {
+            parse_quote!({wasmyon::run_in_worker_serde(move || #wasm_fn_body)})
+        }
+        JsValueParsing::SerdeWasmBindgen => {
+            parse_quote!({wasmyon::run_in_worker_serde_wasm_bindgen(move || #wasm_fn_body)})
+        }
+    });
     wasm_fn.sig.output = ReturnType::Type(
         RArrow::default(),
         Box::new(Type::Verbatim(quote!(js_sys::Promise))),
